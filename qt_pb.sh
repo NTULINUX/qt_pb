@@ -11,27 +11,21 @@ QT_PB_GIT_OPTS=(--depth=1 --single-branch -b "${QT_PB_BRANCH}")
 
 mkdir -p "${QT_PB_DIR}"
 
-if [[ ! -d "${QTPYVCP_DIR}" ]] ; then
-	git clone "${QT_PB_GIT_OPTS[@]}" \
-		https://github.com/kcjengr/qtpyvcp.git \
-		"${QTPYVCP_DIR}"
-else
-	cd "${QTPYVCP_DIR}"
-	git pull
-fi
+for i in qtpyvcp probe_basic ; do
+	GIT_DIR="${QT_PB_DIR}/${i}"
+	GIT_SRC="https://github.com/kcjengr/${i}.git"
 
-if [[ ! -d "${PB_DIR}" ]] ; then
-	git clone "${QT_PB_GIT_OPTS[@]}" \
-		https://github.com/kcjengr/probe_basic.git \
-		"${PB_DIR}"
-else
-	cd "${PB_DIR}"
-	git pull
-fi
+	if [[ ! -d "${GIT_DIR}" ]] ; then
+		git clone "${QT_PB_GIT_OPTS[@]}" "${GIT_SRC}" "${GIT_DIR}"
+	else
+		cd "${GIT_DIR}"
+		git clean -dxf
+		git pull
+	fi
+done
 
 setup_qtpyvcp() {
 	cd "${QTPYVCP_DIR}"
-	git clean -dxf
 	python -m venv venv --system-site-packages
 	source "${QTPYVCP_DIR}/venv/bin/activate"
 	pip install hiyapyco
@@ -42,7 +36,6 @@ setup_qtpyvcp() {
 
 setup_probe_basic() {
 	cd "${PB_DIR}"
-	git clean -dxf
 	pip install -e "${PB_DIR}"
 	qcompile "${PB_DIR}"
 }
