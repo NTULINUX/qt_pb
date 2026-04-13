@@ -12,7 +12,12 @@ QT_PB_GIT_OPTS=(--depth=1 --single-branch -b "${QT_PB_BRANCH}")
 mkdir -p "${QT_PB_DIR}"
 
 for i in qtpyvcp probe_basic ; do
-	GIT_DIR="${QT_PB_DIR}/${i}"
+	if [[ "${i}" == "qtpyvcp" ]] ; then
+		GIT_DIR="${QTPYVCP_DIR}"
+	elif [[ "${i}" == "probe_basic" ]] ; then
+		GIT_DIR="${PB_DIR}"
+	fi
+
 	GIT_SRC="https://github.com/kcjengr/${i}.git"
 
 	if [[ ! -d "${GIT_DIR}" ]] ; then
@@ -20,29 +25,23 @@ for i in qtpyvcp probe_basic ; do
 	else
 		cd "${GIT_DIR}"
 		git clean -dxf
-		git pull
+		git fetch origin "${QT_PB_BRANCH}"
+		git reset --hard "origin/${QT_PB_BRANCH}"
 	fi
 done
 
-setup_qtpyvcp() {
-	cd "${QTPYVCP_DIR}"
-	python -m venv venv --system-site-packages
-	source "${QTPYVCP_DIR}/venv/bin/activate"
-	pip install hiyapyco
-	pip install -e "${QTPYVCP_DIR}"
-	qcompile "${QTPYVCP_DIR}"
-	qnative
-}
+cd "${QTPYVCP_DIR}"
+python -m venv venv --system-site-packages
+# shellcheck disable=SC1091
+source "${QTPYVCP_DIR}/venv/bin/activate"
+pip install --upgrade pip setuptools wheel hiyapyco
+pip install -e "${QTPYVCP_DIR}"
+qcompile "${QTPYVCP_DIR}"
+qnative
 
-setup_probe_basic() {
-	cd "${PB_DIR}"
-	pip install -e "${PB_DIR}"
-	qcompile "${PB_DIR}"
-}
-
-setup_qtpyvcp
-
-setup_probe_basic
+cd "${PB_DIR}"
+pip install -e "${PB_DIR}"
+qcompile "${PB_DIR}"
 
 if ! grep -q "source ${QTPYVCP_DIR}/venv/bin/activate" "${HOME}/.bashrc" ; then
 	echo "source ${QTPYVCP_DIR}/venv/bin/activate" >> "${HOME}/.bashrc"
