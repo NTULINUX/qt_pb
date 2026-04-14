@@ -26,7 +26,7 @@ for i in qtpyvcp probe_basic ; do
 		cd "${GIT_DIR}"
 		git clean -dxf
 		git fetch origin "${QT_PB_BRANCH}"
-		git reset --hard "origin/${QT_PB_BRANCH}"
+		git reset --hard FETCH_HEAD
 	fi
 done
 
@@ -42,6 +42,15 @@ qnative
 cd "${PB_DIR}"
 pip install -e "${PB_DIR}"
 qcompile "${PB_DIR}"
+
+mkdir -p "${HOME}/.local/share/fonts"
+
+if [[ -r "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" ]] ; then
+	cp -L "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" \
+		"${HOME}/.local/share/fonts/"
+fi
+
+fc-cache -f
 
 if ! grep -q "source ${QTPYVCP_DIR}/venv/bin/activate" "${HOME}/.bashrc" ; then
 	echo "source ${QTPYVCP_DIR}/venv/bin/activate" >> "${HOME}/.bashrc"
