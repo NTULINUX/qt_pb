@@ -6,8 +6,8 @@ QT_PB_DIR="${HOME}/qt_pb"
 QTPYVCP_DIR="${QT_PB_DIR}/qtpyvcp"
 PB_DIR="${QT_PB_DIR}/probe_basic"
 
-QT_PB_BRANCH="pyside6"
-QT_PB_GIT_OPTS=(--depth=1 --single-branch -b "${QT_PB_BRANCH}")
+# Only pyside6 is supported
+QT_PB_GIT_OPTS=(--depth=1 --single-branch -b pyside6)
 
 mkdir -p "${QT_PB_DIR}"
 
@@ -25,7 +25,7 @@ for i in qtpyvcp probe_basic ; do
 	else
 		cd "${GIT_DIR}"
 		git clean -dxf
-		git fetch origin "${QT_PB_BRANCH}"
+		git fetch origin pyside6
 		git reset --hard FETCH_HEAD
 	fi
 done
@@ -48,6 +48,9 @@ mkdir -p "${HOME}/.local/share/fonts"
 if [[ -r "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" ]] ; then
 	cp -L "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" \
 		"${HOME}/.local/share/fonts/"
+else
+	echo "ERROR: CANNOT FIND FONT FOR PROBE BASIC!"
+	exit 1
 fi
 
 fc-cache -f
