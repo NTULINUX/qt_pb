@@ -31,10 +31,13 @@ for i in qtpyvcp probe_basic ; do
 done
 
 cd "${QTPYVCP_DIR}"
-python -m venv venv --system-site-packages
+python3 -m venv venv --system-site-packages
 # shellcheck disable=SC1091
 source "${QTPYVCP_DIR}/venv/bin/activate"
-pip install --upgrade pip setuptools wheel hiyapyco
+
+pip install --upgrade pip setuptools wheel hiyapyco \
+	recommonmark jupyter-sphinx-theme
+
 pip install -e "${QTPYVCP_DIR}"
 qcompile "${QTPYVCP_DIR}"
 qnative
