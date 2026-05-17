@@ -36,7 +36,7 @@ python3 -m venv venv --system-site-packages
 source "${QTPYVCP_DIR}/venv/bin/activate"
 
 pip install --upgrade pip setuptools wheel hiyapyco \
-	recommonmark jupyter-sphinx-theme
+	recommonmark
 
 pip install -e "${QTPYVCP_DIR}"
 qcompile "${QTPYVCP_DIR}"
@@ -57,6 +57,8 @@ else
 fi
 
 fc-cache -f
+
+touch "${HOME}/.bashrc"
 
 if ! grep -q "source ${QTPYVCP_DIR}/venv/bin/activate" "${HOME}/.bashrc" ; then
 	echo "source ${QTPYVCP_DIR}/venv/bin/activate" >> "${HOME}/.bashrc"
