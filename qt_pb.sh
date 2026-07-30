@@ -5,6 +5,17 @@ set -eou pipefail
 QT_PB_DIR="${HOME}/qt_pb"
 QTPYVCP_DIR="${QT_PB_DIR}/qtpyvcp"
 PB_DIR="${QT_PB_DIR}/probe_basic"
+LINUXCNC_CONFDIR="${HOME}/linuxcnc/configs"
+PB_CONFIGS=(
+	"atc_sim"
+	"machine_setup_files"
+	"probe_basic"
+	"probe_basic_asm"
+	"probe_basic_lathe"
+	"probe_basic_lathe_mm"
+	"probe_basic_robot"
+	"rack_atc_sim"
+)
 
 # Only pyside6 is supported
 QT_PB_GIT_OPTS=(--depth=1 --single-branch -b pyside6)
@@ -48,8 +59,10 @@ qcompile "${PB_DIR}"
 
 mkdir -p "${HOME}/.local/share/fonts"
 
+echo "Copying font for Probe Basic..."
+
 if [[ -r "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" ]] ; then
-	cp -L "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" \
+	cp -arL "${PB_DIR}/fonts/ProbeBasicBebasMono.ttf" \
 		"${HOME}/.local/share/fonts/"
 else
 	echo "ERROR: CANNOT FIND FONT FOR PROBE BASIC!"
@@ -58,8 +71,22 @@ fi
 
 fc-cache -f
 
+echo "Done."
+
 touch "${HOME}/.bashrc"
 
 if ! grep -q "source ${QTPYVCP_DIR}/venv/bin/activate" "${HOME}/.bashrc" ; then
 	echo "source ${QTPYVCP_DIR}/venv/bin/activate" >> "${HOME}/.bashrc"
 fi
+
+echo "Refreshing Probe Basic configs in LinuxCNC directory..."
+
+mkdir -p "${LINUXCNC_CONFDIR}"
+
+for i in "${PB_CONFIGS[@]:?}" ; do
+	rm -rf "${LINUXCNC_CONFDIR:?}/${i:?}"
+	cp -arL "${PB_DIR}/configs/${i}" "${LINUXCNC_CONFDIR}/"
+done
+
+
+echo "Complete! You may now open a NEW terminal and launch LinuxCNC."
