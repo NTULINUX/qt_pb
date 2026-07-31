@@ -2,6 +2,11 @@
 
 set -eou pipefail
 
+if [[ "${EUID}" -eq 0 ]] ; then
+	echo "ERROR: THIS SCRIPT MUST NOT BE RUN AS ROOT!"
+	exit 1
+fi
+
 QT_PB_DIR="${HOME}/qt_pb"
 QTPYVCP_DIR="${QT_PB_DIR}/qtpyvcp"
 PB_DIR="${QT_PB_DIR}/probe_basic"
