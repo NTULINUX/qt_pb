@@ -10,7 +10,11 @@ fi
 QT_PB_DIR="${HOME}/qt_pb"
 QTPYVCP_DIR="${QT_PB_DIR}/qtpyvcp"
 PB_DIR="${QT_PB_DIR}/probe_basic"
+TURBONC_DIR="${QT_PB_DIR}/turbonc"
+
 LINUXCNC_CONFDIR="${HOME}/linuxcnc/configs"
+LINUXCNC_NCDIR="${HOME}/linuxcnc/nc_files"
+
 PB_CONFIGS=(
 	"atc_sim"
 	"machine_setup_files"
@@ -22,26 +26,39 @@ PB_CONFIGS=(
 	"rack_atc_sim"
 )
 
-# Only pyside6 is supported
-QT_PB_GIT_OPTS=(--depth=1 --single-branch -b pyside6)
+TURBONC_CONFIGS=(
+	"sim.qtpyvcp"
+	"sim.robot_thor"
+)
+
+TURBONC_NCFILES=(
+	"qtpyvcp"
+)
+
+QT_PB_GIT_OPTS=(--depth=1 --single-branch)
 
 mkdir -p "${QT_PB_DIR}"
 
-for i in qtpyvcp probe_basic ; do
+for i in qtpyvcp probe_basic turbonc ; do
 	if [[ "${i}" == "qtpyvcp" ]] ; then
 		GIT_DIR="${QTPYVCP_DIR}"
+		GIT_BRANCH="linuxcnc_types"
 	elif [[ "${i}" == "probe_basic" ]] ; then
 		GIT_DIR="${PB_DIR}"
+		GIT_BRANCH="pyside6"
+	elif [[ "${i}" == "turbonc" ]] ; then
+		GIT_DIR="${TURBONC_DIR}"
+		GIT_BRANCH="pyside6"
 	fi
 
 	GIT_SRC="https://github.com/kcjengr/${i}.git"
 
 	if [[ ! -d "${GIT_DIR}" ]] ; then
-		git clone "${QT_PB_GIT_OPTS[@]}" "${GIT_SRC}" "${GIT_DIR}"
+		git clone "${QT_PB_GIT_OPTS[@]}" -b "${GIT_BRANCH}" "${GIT_SRC}" "${GIT_DIR}"
 	else
 		cd "${GIT_DIR}"
 		git clean -dxf
-		git fetch origin pyside6
+		git fetch origin "${GIT_BRANCH}"
 		git reset --hard FETCH_HEAD
 	fi
 done
@@ -58,9 +75,11 @@ pip install -e "${QTPYVCP_DIR}"
 qcompile "${QTPYVCP_DIR}"
 qnative
 
-cd "${PB_DIR}"
 pip install -e "${PB_DIR}"
 qcompile "${PB_DIR}"
+
+pip install -e "${TURBONC_DIR}"
+qcompile "${TURBONC_DIR}"
 
 mkdir -p "${HOME}/.local/share/fonts"
 
@@ -90,8 +109,21 @@ mkdir -p "${LINUXCNC_CONFDIR}"
 
 for i in "${PB_CONFIGS[@]:?}" ; do
 	rm -rf "${LINUXCNC_CONFDIR:?}/${i:?}"
-	cp -arL "${PB_DIR}/configs/${i}" "${LINUXCNC_CONFDIR}/"
+	cp -arL "${PB_DIR}/configs/${i}" "${LINUXCNC_CONFDIR}/${i}"
 done
 
+echo "Refreshing TurBo NC files in LinuxCNC directory..."
+
+mkdir -p "${LINUXCNC_NCDIR}"
+
+for i in "${TURBONC_NCFILES[@]:?}" ; do
+	rm -rf "${LINUXCNC_NCDIR:?}/${i:?}"
+	cp -arL "${TURBONC_DIR}/linuxcnc/nc_files/${i}" "${LINUXCNC_NCDIR}/${i}"
+done
+
+for i in "${TURBONC_CONFIGS[@]:?}" ; do
+	rm -rf "${LINUXCNC_CONFDIR:?}/${i:?}"
+	cp -arL "${TURBONC_DIR}/linuxcnc/configs/${i}" "${LINUXCNC_CONFDIR}/${i}"
+done
 
 echo "Complete! You may now open a NEW terminal and launch LinuxCNC."
