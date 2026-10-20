@@ -42,7 +42,7 @@ mkdir -p "${QT_PB_DIR}"
 for i in qtpyvcp probe_basic turbonc ; do
 	if [[ "${i}" == "qtpyvcp" ]] ; then
 		GIT_DIR="${QTPYVCP_DIR}"
-		GIT_BRANCH="linuxcnc_types"
+		GIT_BRANCH="qt3d0"
 	elif [[ "${i}" == "probe_basic" ]] ; then
 		GIT_DIR="${PB_DIR}"
 		GIT_BRANCH="pyside6"
