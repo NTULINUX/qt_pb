@@ -73,7 +73,7 @@ pip install --upgrade pip setuptools wheel hiyapyco \
 
 pip install -e "${QTPYVCP_DIR}"
 qcompile "${QTPYVCP_DIR}"
-qnative
+CC="clang" CXX="clang++" qnative
 
 pip install -e "${PB_DIR}"
 qcompile "${PB_DIR}"
