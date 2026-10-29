@@ -15,16 +15,16 @@ TURBONC_DIR="${QT_PB_DIR}/turbonc"
 LINUXCNC_CONFDIR="${HOME}/linuxcnc/configs"
 LINUXCNC_NCDIR="${HOME}/linuxcnc/nc_files"
 
-PB_CONFIGS=(
-	"atc_sim"
-	"machine_setup_files"
-	"probe_basic"
-	"probe_basic_asm"
-	"probe_basic_lathe"
-	"probe_basic_lathe_mm"
-	"probe_basic_robot"
-	"rack_atc_sim"
-)
+#PB_CONFIGS=(
+#	"atc_sim"
+#	"machine_setup_files"
+#	"probe_basic"
+#	"probe_basic_asm"
+#	"probe_basic_lathe"
+#	"probe_basic_lathe_mm"
+#	"probe_basic_robot"
+#	"rack_atc_sim"
+#)
 
 TURBONC_CONFIGS=(
 	"sim.qtpyvcp"
@@ -75,8 +75,8 @@ pip install -e "${QTPYVCP_DIR}"
 qcompile "${QTPYVCP_DIR}"
 CC="clang" CXX="clang++" qnative
 
-pip install -e "${PB_DIR}"
-qcompile "${PB_DIR}"
+#pip install -e "${PB_DIR}"
+#qcompile "${PB_DIR}"
 
 pip install -e "${TURBONC_DIR}"
 qcompile "${TURBONC_DIR}"
@@ -97,20 +97,14 @@ fc-cache -f
 
 echo "Done."
 
-touch "${HOME}/.bashrc"
-
-if ! grep -q "source ${QTPYVCP_DIR}/venv/bin/activate" "${HOME}/.bashrc" ; then
-	echo "source ${QTPYVCP_DIR}/venv/bin/activate" >> "${HOME}/.bashrc"
-fi
-
-echo "Refreshing Probe Basic configs in LinuxCNC directory..."
+#echo "Refreshing Probe Basic configs in LinuxCNC directory..."
 
 mkdir -p "${LINUXCNC_CONFDIR}"
 
-for i in "${PB_CONFIGS[@]:?}" ; do
-	rm -rf "${LINUXCNC_CONFDIR:?}/${i:?}"
-	cp -arL "${PB_DIR}/configs/${i}" "${LINUXCNC_CONFDIR}/${i}"
-done
+#for i in "${PB_CONFIGS[@]:?}" ; do
+#	rm -rf "${LINUXCNC_CONFDIR:?}/${i:?}"
+#	cp -arL "${PB_DIR}/configs/${i}" "${LINUXCNC_CONFDIR}/${i}"
+#done
 
 echo "Refreshing TurBo NC files in LinuxCNC directory..."
 
@@ -125,5 +119,11 @@ for i in "${TURBONC_CONFIGS[@]:?}" ; do
 	rm -rf "${LINUXCNC_CONFDIR:?}/${i:?}"
 	cp -arL "${TURBONC_DIR}/linuxcnc/configs/${i}" "${LINUXCNC_CONFDIR}/${i}"
 done
+
+touch "${HOME}/.bashrc"
+
+if ! grep -q "source ${QTPYVCP_DIR}/venv/bin/activate" "${HOME}/.bashrc" ; then
+	echo "source ${QTPYVCP_DIR}/venv/bin/activate" >> "${HOME}/.bashrc"
+fi
 
 echo "Complete! You may now open a NEW terminal and launch LinuxCNC."
