@@ -1,5 +1,5 @@
 # qt_pb
 
-Automatically configures a venv for probe_basic, TurBo NC and qtpyvcp
+Automatically configures a venv for TurBo NC and qtpyvcp (Probe Basic temporarily disabled)
 
 Distro-independent.
